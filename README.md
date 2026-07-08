@@ -1,4 +1,4 @@
-# PlayZone Futsal Booking System
+# Futsal Booking System
 
 This is my internship project. A web-based futsal court booking system built using ASP.NET Core MVC.
 
