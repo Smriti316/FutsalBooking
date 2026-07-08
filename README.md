@@ -4,7 +4,7 @@ This is my internship project. A web-based futsal court booking system built usi
 
 ## About the Project
 
-The company (PlayZone Futsal, Baneshwor) was managing all bookings through phone calls and a physical register. This was causing problems like double bookings, no booking history, and difficulty for customers to check availability.
+The company (SGlory Futsal, Bhaktapur) was managing all bookings through phone calls and a physical register. This was causing problems like double bookings, no booking history, and difficulty for customers to check availability.
 
 My task was to build a simple online booking system to solve these problems.
 
