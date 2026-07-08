@@ -1,0 +1,251 @@
+﻿@model FutsalBooking.Models.AdminViewModel
+@{
+    ViewData["Title"] = "Admin Dashboard";
+}
+
+<div class="container-fluid py-4 px-4">
+    <h2 class="page-title">Admin Dashboard</h2>
+
+    <!-- stat cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-icon blue">
+                    <i class="fas fa-calendar-check"></i>
+                </div>
+                <div>
+                    <h3>@Model.TotalBookings</h3>
+                    <p>Total Bookings</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-icon orange">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div>
+                    <h3>@Model.TodayBookings</h3>
+                    <p>Today's Bookings</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-icon green">
+                    <i class="fas fa-money-bill-wave"></i>
+                </div>
+                <div>
+                    <h3>Rs. @Model.TotalRevenue.ToString("N0")</h3>
+                    <p>Total Revenue</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-icon purple">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div>
+                    <h3>@Model.TotalUsers</h3>
+                    <p>Total Users</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @* quick action buttons + court status *@
+    <div class="mb-4 d-flex align-items-center gap-2 flex-wrap">
+        <a asp-action="Bookings" class="btn btn-primary">
+            <i class="fas fa-list me-1"></i>All Bookings
+        </a>
+        <a asp-action="Users" class="btn btn-secondary">
+            <i class="fas fa-users me-1"></i>Users
+        </a>
+        <a asp-action="EditCourt" class="btn btn-outline-primary">
+            <i class="fas fa-edit me-1"></i>Edit Court
+        </a>
+
+        @if (ViewBag.CourtIsActive == true)
+        {
+            <span class="badge bg-success p-2 fs-6">
+                <i class="fas fa-circle me-1"></i>Court Open
+            </span>
+            <form asp-action="ToggleCourtStatus" method="post" class="d-inline" id="toggleForm">
+                <button type="button" class="btn btn-danger" onclick="confirmToggle(false)">
+                    <i class="fas fa-door-closed me-1"></i>Close Court
+                </button>
+            </form>
+        }
+        else
+        {
+            <span class="badge bg-danger p-2 fs-6">
+                <i class="fas fa-circle me-1"></i>Court Closed
+            </span>
+            <form asp-action="ToggleCourtStatus" method="post" class="d-inline" id="toggleForm">
+                <button type="button" class="btn btn-success" onclick="confirmToggle(true)">
+                    <i class="fas fa-door-open me-1"></i>Open Court
+                </button>
+            </form>
+        }
+    </div>
+
+    @* confirmation modal *@
+    <div class="modal fade" id="confirmModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header" id="modalHeader">
+                    <h5 class="modal-title" id="modalTitle">Confirm</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="modalMessage" class="mb-0 fs-5"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                        No, Cancel
+                    </button>
+                    <button type="button" class="btn" id="confirmBtn" onclick="submitToggle()">
+                        Yes, Confirm
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+     @* recent bookings table  *@
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <i class="fas fa-history me-2"></i>Recent Bookings
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0 align-middle">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Customer</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>Payment</th>
+                            <th>Update Status</th>
+                            <th>Update Payment</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (!Model.RecentBookings.Any())
+                        {
+                            <tr>
+                                <td colspan="9" class="text-center py-4 text-muted">No bookings yet</td>
+                            </tr>
+                        }
+                        @foreach (var b in Model.RecentBookings)
+                        {
+                            <tr>
+                                <td>@b.Id</td>
+                                <td>
+                                    <strong>@b.User?.FullName</strong><br />
+                                    <small class="text-muted">@b.User?.PhoneNumber</small>
+                                </td>
+                                <td>@b.BookingDate.ToString("dd MMM yyyy")</td>
+                                <td>
+                                    @b.StartTime.Hours.ToString("D2"):@b.StartTime.Minutes.ToString("D2")
+                                    -
+                                    @b.EndTime.Hours.ToString("D2"):@b.EndTime.Minutes.ToString("D2")
+                                </td>
+                                <td class="text-success fw-bold">Rs. @b.TotalAmount.ToString("N0")</td> 
+                                <td>
+                                    @{
+                                        var sc = b.Status switch
+                                        {
+                                            BookingStatus.Confirmed => "bg-success",
+                                            BookingStatus.Pending => "bg-warning text-dark",
+                                            BookingStatus.Cancelled => "bg-danger",
+                                            _ => "bg-secondary"
+                                        };
+                                    }
+                                    <span class="badge @sc">@b.Status</span>
+                                </td>
+                                <td>
+                                    <span class="badge @(b.PaymentStatus == PaymentStatus.Paid ? "bg-success" : "bg-danger")">
+                                        @b.PaymentStatus
+                                    </span>
+                                </td>
+                                <td>
+                                    <form asp-action="UpdateBookingStatus" method="post">
+                                        <input type="hidden" name="id" value="@b.Id" />
+                                        <select name="status" class="form-select form-select-sm" onchange="this.form.submit()">
+                                            @foreach (var s in Enum.GetValues<BookingStatus>())
+                                            {
+                                                if (b.Status == s)
+                                                {
+                                                    <option value="@s" selected>@s</option>
+                                                }
+                                                else
+                                                {
+                                                    <option value="@s">@s</option>
+                                                }
+                                            }
+                                        </select>
+                                    </form>
+                                </td>
+                                <td>
+                                    <form asp-action="UpdatePaymentStatus" method="post">
+                                        <input type="hidden" name="id" value="@b.Id" />
+                                        <select name="status" class="form-select form-select-sm" onchange="this.form.submit()">
+                                            @foreach (var s in Enum.GetValues<PaymentStatus>())
+                                            {
+                                                if (b.PaymentStatus == s)
+                                                {
+                                                    <option value="@s" selected>@s</option>
+                                                }
+                                                else
+                                                {
+                                                    <option value="@s">@s</option>
+                                                }
+                                            }
+                                        </select>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function confirmToggle(isOpening) {
+            const modal = new bootstrap.Modal(document.getElementById('confirmModal'));
+            const title = document.getElementById('modalTitle');
+            const message = document.getElementById('modalMessage');
+            const confirmBtn = document.getElementById('confirmBtn');
+            const header = document.getElementById('modalHeader');
+
+            if (isOpening) {
+                title.textContent = 'Open Court';
+                message.textContent = 'Do you want to OPEN the court? ';
+                confirmBtn.textContent = 'Yes';
+                confirmBtn.className = 'btn btn-success';
+                header.className = 'modal-header bg-success text-white';
+            } else {
+                title.textContent = 'Close Court';
+                message.textContent = 'Do you want to CLOSE the court? Customers will not be able to make bookings.';
+                confirmBtn.textContent = 'Yes';
+                confirmBtn.className = 'btn btn-danger';
+                header.className = 'modal-header bg-danger text-white';
+            }
+
+            modal.show();
+        }
+
+        function submitToggle() {
+            document.getElementById('toggleForm').submit();
+        }
+    </script>
+}

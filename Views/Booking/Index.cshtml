@@ -1,0 +1,92 @@
+@model List<FutsalBooking.Models.Booking>
+@{
+    ViewData["Title"] = "My Bookings";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="fas fa-calendar-alt me-2 text-success"></i>My Bookings</h2>
+        <a asp-controller="Home" asp-action="Courts" class="btn btn-success">
+            <i class="fas fa-plus me-2"></i>New Booking
+        </a>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="text-center py-5">
+            <i class="fas fa-calendar-times fa-4x text-muted mb-3"></i>
+            <h4 class="text-muted">No bookings yet</h4>
+            <p class="text-muted">Book a court to get started!</p>
+            <a asp-controller="Home" asp-action="Courts" class="btn btn-success mt-2">Browse Courts</a>
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>#</th>
+                        <th>Court</th>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th>Payment</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var booking in Model)
+                    {
+                        <tr>
+                            <td>@booking.Id</td>
+                            <td><strong>@booking.Court?.Name</strong></td>
+                            <td>@booking.BookingDate.ToString("dd MMM yyyy")</td>
+                            <td>
+                                @booking.StartTime.ToString(@"hh\:mm") -
+                                @booking.EndTime.ToString(@"hh\:mm")
+                            </td>
+                            <td class="text-success fw-bold">Rs. @booking.TotalAmount.ToString("N0")</td>
+                            <td>
+                                @{
+                                    var statusClass = booking.Status switch
+                                    {
+                                        FutsalBooking.Models.BookingStatus.Confirmed => "bg-success",
+                                        FutsalBooking.Models.BookingStatus.Pending => "bg-warning text-dark",
+                                        FutsalBooking.Models.BookingStatus.Cancelled => "bg-danger",
+                                        FutsalBooking.Models.BookingStatus.Completed => "bg-secondary",
+                                        _ => "bg-secondary"
+                                    };
+                                }
+                                <span class="badge @statusClass">@booking.Status</span>
+                            </td>
+                            <td>
+                                @{
+                                    var payClass = booking.PaymentStatus == FutsalBooking.Models.PaymentStatus.Paid ? "bg-success" : "bg-danger";
+                                }
+                                <span class="badge @payClass">@booking.PaymentStatus</span>
+                            </td>
+                            <td>
+                                <a asp-action="Details" asp-route-id="@booking.Id" class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                @if (booking.Status == FutsalBooking.Models.BookingStatus.Pending ||
+                                     booking.Status == FutsalBooking.Models.BookingStatus.Confirmed)
+                                {
+                                    <form asp-action="Cancel" asp-route-id="@booking.Id" method="post" class="d-inline"
+                                          onsubmit="return confirm('Cancel this booking?')">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger ms-1">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </form>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

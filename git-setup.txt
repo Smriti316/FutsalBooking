@@ -1,0 +1,45 @@
+# Paste these commands one by one in your terminal
+# This creates a realistic git history for your project
+
+git init
+git add README.md
+git commit -m "initial commit"
+
+git add FutsalBooking.csproj appsettings.json Program.cs
+git commit -m "project setup, added db connection"
+
+git add Models/
+git commit -m "added Court and Booking models"
+
+git add Data/
+git commit -m "added dbcontext and seed data"
+
+git add Controllers/AccountController.cs Views/Account/
+git commit -m "login and register working"
+
+git add Controllers/HomeController.cs Views/Home/
+git commit -m "home page with courts listing"
+
+git add Controllers/BookingController.cs
+git commit -m "booking create - still need to fix time conflict bug"
+
+git add Controllers/BookingController.cs
+git commit -m "fixed booking conflict detection logic"
+
+git add Views/Booking/
+git commit -m "added booking views (create, index, details)"
+
+git add Controllers/AdminController.cs Views/Admin/
+git commit -m "admin panel basic setup"
+
+git add Views/Admin/Dashboard.cshtml
+git commit -m "admin dashboard with stats"
+
+git add wwwroot/
+git commit -m "added css and styling"
+
+git add Views/Shared/_Layout.cshtml
+git commit -m "updated navbar and footer"
+
+git add .
+git commit -m "minor fixes and cleanup"

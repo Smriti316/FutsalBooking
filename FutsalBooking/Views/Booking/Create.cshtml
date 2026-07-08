@@ -1,0 +1,128 @@
+﻿@model FutsalBooking.Models.BookingViewModel
+@{
+    ViewData["Title"] = "Book a Slot";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <h2 class="page-title">Book a Time Slot</h2>
+            <div class="row">
+                <!-- booking form -->
+                <div class="col-md-7">
+                    <div class="card">
+                        <div class="card-header bg-primary text-white">
+                            <i class="fas fa-calendar me-2"></i>Select Date & Time
+                        </div>
+                        <div class="card-body p-4">
+                            <form asp-action="Create" method="post" id="bookingForm">
+                                @if (!ViewData.ModelState.IsValid)
+                                {
+                                    <div asp-validation-summary="All" class="alert alert-danger"></div>
+                                }
+                                <div class="mb-3">
+                                    <label class="form-label">Booking Date</label>
+                                    <input asp-for="BookingDate" type="date" class="form-control"
+                                           min="@DateTime.Today.ToString("yyyy-MM-dd")" />
+                                    <span asp-validation-for="BookingDate" class="text-danger small"></span>
+                                </div> 
+                                <div class="row">
+                                    <div class="col-6 mb-3">
+                                        <label class="form-label">Start Time</label>
+                                        <select asp-for="StartTime" class="form-select" id="startTime">
+                                            @for (int h = 6; h < 22; h++)
+                                            {
+                                                <option value="@h.ToString("D2"):00">@h.ToString("D2"):00</option>
+                                            }
+                                        </select>
+                                    </div>
+                                    <div class="col-6 mb-3">
+                                        <label class="form-label">End Time</label>
+                                        <select asp-for="EndTime" class="form-select" id="endTime">
+                                            @for (int h = 7; h <= 22; h++)
+                                            {
+                                                <option value="@h.ToString("D2"):00">@h.ToString("D2"):00</option>
+                                            }
+                                        </select>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-primary w-100 py-2 mt-2">
+                                    <i class="fas fa-check me-2"></i>Confirm Booking
+                                </button>
+                                <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary w-100 mt-2">Cancel</a>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <!-- booking summary -->
+                <div class="col-md-5">
+                    <div class="card">
+                        <div class="card-header bg-primary text-white">
+                            <i class="fas fa-receipt me-2"></i>Booking Summary
+                        </div>
+                        <div class="card-body p-4">
+                            <div class="booking-summary-row">
+                                <span class="text-muted">Court</span>
+                                <span class="fw-semibold">SGlory Futsal</span>
+                            </div>
+                            <div class="booking-summary-row">
+                                <span class="text-muted">Date</span>
+                                <span class="fw-semibold" id="summaryDate">-</span>
+                            </div>
+                            <div class="booking-summary-row">
+                                <span class="text-muted">Time</span>
+                                <span class="fw-semibold" id="summaryTime">-</span>
+                            </div>
+                            <div class="booking-summary-row">
+                                <span class="text-muted">Duration</span>
+                                <span class="fw-semibold" id="summaryDuration">-</span>
+                            </div>
+                            <div class="booking-summary-row">
+                                <span class="text-muted">Rate</span>
+                                <span class="fw-semibold">Rs. @(ViewBag.PricePerHour ?? 0)/hr</span>
+                            </div>
+                            <div class="booking-summary-row total mt-2">
+                                <span>Total</span>
+                                <span id="summaryTotal">Rs. 0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const pricePerHour = @(ViewBag.PricePerHour ?? 0);
+
+        function updateSummary() {
+            const start = parseInt(document.getElementById('startTime').value.split(':')[0]);
+            const end = parseInt(document.getElementById('endTime').value.split(':')[0]);
+            const hours = end - start;
+            const dateVal = document.querySelector('input[name="BookingDate"]').value;
+
+            if (dateVal) {
+                const d = new Date(dateVal);
+                document.getElementById('summaryDate').textContent = d.toLocaleDateString('en-US', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+            }
+
+            document.getElementById('summaryTime').textContent = start.toString().padStart(2,'0') + ':00 - ' + end.toString().padStart(2,'0') + ':00';
+
+            if (hours > 0) {
+                const total = hours * pricePerHour;
+                document.getElementById('summaryDuration').textContent = hours + ' hour(s)';
+                document.getElementById('summaryTotal').textContent = 'Rs. ' + total.toLocaleString();
+            } else {
+                document.getElementById('summaryDuration').textContent = '-';
+                document.getElementById('summaryTotal').textContent = 'Rs. 0';
+            }
+        }
+
+        document.getElementById('startTime').addEventListener('change', updateSummary);
+        document.getElementById('endTime').addEventListener('change', updateSummary);
+        document.querySelector('input[name="BookingDate"]').addEventListener('change', updateSummary);
+        updateSummary();
+    </script>
+}

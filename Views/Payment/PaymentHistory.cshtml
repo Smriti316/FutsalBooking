@@ -1,0 +1,73 @@
+@model List<FutsalBooking.Models.Payment>
+@{
+    ViewData["Title"] = "Payment History";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="fas fa-money-bill-wave me-2 text-success"></i>Payment History</h2>
+        <a asp-controller="Booking" asp-action="Details" asp-route-id="@ViewBag.BookingId"
+           class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-1"></i>Back to Booking
+        </a>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="text-center py-4">
+            <p class="text-muted">No payment records found for this booking.</p>
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>#</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th>Transaction ID</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var p in Model)
+                    {
+                        <tr>
+                            <td>@p.Id</td>
+                            <td class="fw-bold">Rs. @((p.AmountInPaisa / 100).ToString("N0"))</td>
+                            <td>
+                                @{
+                                    var badgeClass = p.State switch {
+                                        FutsalBooking.Models.PaymentState.Completed => "bg-success",
+                                        FutsalBooking.Models.PaymentState.Initiated => "bg-warning text-dark",
+                                        FutsalBooking.Models.PaymentState.Failed => "bg-danger",
+                                        _ => "bg-secondary"
+                                    };
+                                }
+                                <span class="badge @badgeClass">@p.State</span>
+                            </td>
+                            <td>
+                                @if (!string.IsNullOrEmpty(p.TransactionId))
+                                {
+                                    <code>@p.TransactionId</code>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">-</span>
+                                }
+                            </td>
+                            <td>
+                                @(p.PaidAt.HasValue
+                                    ? p.PaidAt.Value.ToString("dd MMM yyyy, hh:mm tt")
+                                    : p.CreatedAt.ToString("dd MMM yyyy, hh:mm tt"))
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

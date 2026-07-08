@@ -1,0 +1,82 @@
+@model FutsalBooking.Models.ViewModels.RegisterViewModel
+@{
+    ViewData["Title"] = "Register";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="auth-page">
+    <div class="container">
+        <div class="row justify-content-center py-5">
+            <div class="col-md-6">
+                <div class="auth-card card shadow">
+                    <div class="card-body p-4">
+                        <div class="text-center mb-4">
+                            <i class="fas fa-futbol fa-3x text-success mb-2"></i>
+                            <h3>Create Account</h3>
+                            <p class="text-muted">Register to start booking courts</p>
+                        </div>
+
+                        <form asp-action="Register" method="post">
+                            <div asp-validation-summary="All" class="alert alert-danger"></div>
+
+                            <div class="mb-3">
+                                <label asp-for="FullName" class="form-label"></label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                    <input asp-for="FullName" class="form-control" placeholder="Your full name" />
+                                </div>
+                                <span asp-validation-for="FullName" class="text-danger small"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="Email" class="form-label"></label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                    <input asp-for="Email" class="form-control" placeholder="your@email.com" />
+                                </div>
+                                <span asp-validation-for="Email" class="text-danger small"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="PhoneNumber" class="form-label"></label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-phone"></i></span>
+                                    <input asp-for="PhoneNumber" class="form-control" placeholder="98XXXXXXXX" />
+                                </div>
+                                <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="Password" class="form-label"></label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                    <input asp-for="Password" class="form-control" placeholder="Min 6 characters" />
+                                </div>
+                                <span asp-validation-for="Password" class="text-danger small"></span>
+                            </div>
+
+                            <div class="mb-4">
+                                <label asp-for="ConfirmPassword" class="form-label"></label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                    <input asp-for="ConfirmPassword" class="form-control" placeholder="Repeat password" />
+                                </div>
+                                <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+                            </div>
+
+                            <button type="submit" class="btn btn-success w-100 py-2">
+                                <i class="fas fa-user-plus me-2"></i>Create Account
+                            </button>
+
+                            <hr />
+                            <p class="text-center mb-0">
+                                Already have an account?
+                                <a asp-action="Login" class="text-success fw-bold">Login here</a>
+                            </p>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

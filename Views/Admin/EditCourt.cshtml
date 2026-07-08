@@ -1,0 +1,61 @@
+@model FutsalBooking.Models.Court
+@{
+    ViewData["Title"] = "Edit Court";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-edit me-2"></i>Edit Court</h5>
+                </div>
+                <div class="card-body p-4">
+                    <form asp-action="EditCourt" method="post">
+                        <input asp-for="Id" type="hidden" />
+                        <div asp-validation-summary="All" class="alert alert-danger"></div>
+
+                        <div class="mb-3">
+                            <label asp-for="Name" class="form-label fw-semibold"></label>
+                            <input asp-for="Name" class="form-control" />
+                            <span asp-validation-for="Name" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Description" class="form-label fw-semibold"></label>
+                            <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="PricePerHour" class="form-label fw-semibold"></label>
+                            <div class="input-group">
+                                <span class="input-group-text">Rs.</span>
+                                <input asp-for="PricePerHour" class="form-control" />
+                            </div>
+                            <span asp-validation-for="PricePerHour" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="CourtType" class="form-label fw-semibold"></label>
+                            <select asp-for="CourtType" class="form-select">
+                                <option value="Indoor">Indoor</option>
+                                <option value="Outdoor">Outdoor</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-4 form-check">
+                            <input asp-for="IsActive" class="form-check-input" type="checkbox" />
+                            <label asp-for="IsActive" class="form-check-label">Active</label>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-save me-2"></i>Update Court
+                        </button>
+                        <a asp-action="Courts" class="btn btn-outline-secondary w-100 mt-2">Cancel</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

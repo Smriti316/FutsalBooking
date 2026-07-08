@@ -1,0 +1,64 @@
+@model List<FutsalBooking.Models.Court>
+@{
+    ViewData["Title"] = "Manage Courts";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="fas fa-futbol me-2 text-success"></i>Manage Courts</h2>
+        <div>
+            <a asp-action="Dashboard" class="btn btn-outline-secondary me-2">
+                <i class="fas fa-arrow-left me-1"></i>Dashboard
+            </a>
+            <a asp-action="CreateCourt" class="btn btn-success">
+                <i class="fas fa-plus me-2"></i>Add Court
+            </a>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>#</th>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th>Price/Hour</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var court in Model)
+                {
+                    <tr>
+                        <td>@court.Id</td>
+                        <td>
+                            <strong>@court.Name</strong><br/>
+                            <small class="text-muted">@court.Description</small>
+                        </td>
+                        <td><span class="badge @(court.CourtType == "Indoor" ? "bg-primary" : "bg-success")">@court.CourtType</span></td>
+                        <td class="text-success fw-bold">Rs. @court.PricePerHour.ToString("N0")</td>
+                        <td>
+                            <span class="badge @(court.IsActive ? "bg-success" : "bg-danger")">
+                                @(court.IsActive ? "Active" : "Inactive")
+                            </span>
+                        </td>
+                        <td>
+                            <a asp-action="EditCourt" asp-route-id="@court.Id" class="btn btn-sm btn-outline-primary me-1">
+                                <i class="fas fa-edit"></i> Edit
+                            </a>
+                            <form asp-action="DeleteCourt" asp-route-id="@court.Id" method="post" class="d-inline"
+                                  onsubmit="return confirm('Deactivate this court?')">
+                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                    <i class="fas fa-ban"></i> Deactivate
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

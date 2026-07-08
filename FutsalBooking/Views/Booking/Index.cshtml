@@ -1,0 +1,50 @@
+﻿@model IEnumerable<FutsalBooking.Models.Booking>
+<h2>My Bookings</h2>
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+<a asp-action="Create" asp-route-courtId="1" class="btn btn-primary mb-3">
+    Book New Court
+</a>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Court</th>
+            <th>Date</th>
+            <th>Time</th>
+            <th>Status</th>
+            <th>Payment</th>
+            <th>Amount</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var b in Model)
+        {
+            <tr>
+                <td>Court</td>
+                <td>@b.BookingDate.ToShortDateString()</td>
+                <td>@b.StartTime - @b.EndTime</td>
+                <td>@b.Status</td>
+                <td>@b.PaymentStatus</td>
+                <td>Rs. @b.TotalAmount</td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@b.Id" class="btn btn-info btn-sm">Details</a>
+
+                    @if (b.Status.ToString() != "Cancelled")
+                    {
+                        <form asp-action="Cancel" method="post" style="display:inline;">
+                            <input type="hidden" name="id" value="@b.Id" />
+                            <button class="btn btn-danger btn-sm">Cancel</button>
+                        </form>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

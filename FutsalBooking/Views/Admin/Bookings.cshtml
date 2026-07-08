@@ -1,0 +1,127 @@
+﻿@model List<FutsalBooking.Models.Booking>
+@{
+    ViewData["Title"] = "All Bookings";
+}
+
+<div class="container-fluid py-4 px-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="page-title">All Bookings</h2>
+        <a asp-action="Dashboard" class="btn btn-outline-secondary">Back</a>
+    </div>
+
+    <div class="mb-3 d-flex gap-2 flex-wrap">
+        <a asp-action="Bookings"
+           class="btn btn-sm @(ViewBag.CurrentStatus == null ? "btn-dark" : "btn-outline-dark")">
+            All
+        </a>
+        <a asp-action="Bookings" asp-route-status="Pending"
+           class="btn btn-sm @(ViewBag.CurrentStatus == "Pending" ? "btn-warning" : "btn-outline-warning")">
+            Pending
+        </a>
+        <a asp-action="Bookings" asp-route-status="Confirmed"
+           class="btn btn-sm @(ViewBag.CurrentStatus == "Confirmed" ? "btn-success" : "btn-outline-success")">
+            Confirmed
+        </a>
+        <a asp-action="Bookings" asp-route-status="Cancelled"
+           class="btn btn-sm @(ViewBag.CurrentStatus == "Cancelled" ? "btn-danger" : "btn-outline-danger")">
+            Cancelled
+        </a>
+        <a asp-action="Bookings" asp-route-status="Completed"
+           class="btn btn-sm @(ViewBag.CurrentStatus == "Completed" ? "btn-secondary" : "btn-outline-secondary")">
+            Completed
+        </a>
+    </div>
+
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <i class="fas fa-list me-2"></i>
+            @(ViewBag.CurrentStatus ?? "All") Bookings
+            <span class="badge bg-white text-dark ms-2">@Model.Count</span>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Customer</th>
+                            <th>Date & Time</th>
+                            <th>Amount</th>
+                            <th>Booking Status</th>
+                            <th>Payment</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (!Model.Any())
+                        {
+                            <tr>
+                                <td colspan="6" class="text-center py-4 text-muted">
+                                    No bookings found
+                                </td>
+                            </tr>
+                        }
+                        @foreach (var b in Model)
+                        {
+                            <tr>
+                                <td>@b.Id</td>
+                                <td>
+                                    <strong>@b.User?.FullName</strong><br />
+                                    <small class="text-muted">@b.User?.PhoneNumber</small>
+                                </td>
+                                <td>
+                                    @b.BookingDate.ToString("dd MMM yyyy")<br />
+                                    <small>
+                                        @b.StartTime.Hours.ToString("D2"):@b.StartTime.Minutes.ToString("D2")
+                                        –
+                                        @b.EndTime.Hours.ToString("D2"):@b.EndTime.Minutes.ToString("D2")
+                                    </small>
+                                </td>
+                                <td class="text-success fw-bold">
+                                    Rs. @b.TotalAmount.ToString("N0")
+                                </td>
+                                <td>
+                                    <form asp-action="UpdateBookingStatus" method="post">
+                                        <input type="hidden" name="id" value="@b.Id" />
+                                        <select name="status" class="form-select form-select-sm"
+                                                onchange="this.form.submit()">
+                                            @foreach (var s in Enum.GetValues<BookingStatus>())
+                                            {
+                                                if (b.Status == s)
+                                                {
+                                                    <option value="@s" selected>@s</option>
+                                                }
+                                                else
+                                                {
+                                                    <option value="@s">@s</option>
+                                                }
+                                            }
+                                        </select>
+                                    </form>
+                                </td>
+                                <td>
+                                    <form asp-action="UpdatePaymentStatus" method="post">
+                                        <input type="hidden" name="id" value="@b.Id" />
+                                        <select name="status" class="form-select form-select-sm"
+                                                onchange="this.form.submit()">
+                                            @foreach (var s in Enum.GetValues<PaymentStatus>())
+                                            {
+                                                if (b.PaymentStatus == s)
+                                                {
+                                                    <option value="@s" selected>@s</option>
+                                                }
+                                                else
+                                                {
+                                                    <option value="@s">@s</option>
+                                                }
+                                            }
+                                        </select>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

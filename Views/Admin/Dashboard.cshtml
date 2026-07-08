@@ -1,0 +1,142 @@
+@model FutsalBooking.Models.ViewModels.AdminDashboardViewModel
+@{
+    ViewData["Title"] = "Admin Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid py-4 px-4">
+    <h2 class="mb-4"><i class="fas fa-tachometer-alt me-2 text-success"></i>Admin Dashboard</h2>
+
+    <!-- Stats Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-2">
+            <div class="stat-card card text-center p-3 border-success border-top border-4">
+                <i class="fas fa-calendar-check fa-2x text-success mb-2"></i>
+                <h3 class="mb-0">@Model.TotalBookings</h3>
+                <small class="text-muted">Total Bookings</small>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="stat-card card text-center p-3 border-warning border-top border-4">
+                <i class="fas fa-clock fa-2x text-warning mb-2"></i>
+                <h3 class="mb-0">@Model.PendingBookings</h3>
+                <small class="text-muted">Pending</small>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="stat-card card text-center p-3 border-info border-top border-4">
+                <i class="fas fa-calendar-day fa-2x text-info mb-2"></i>
+                <h3 class="mb-0">@Model.TodayBookings</h3>
+                <small class="text-muted">Today</small>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="stat-card card text-center p-3 border-primary border-top border-4">
+                <i class="fas fa-futbol fa-2x text-primary mb-2"></i>
+                <h3 class="mb-0">@Model.TotalCourts</h3>
+                <small class="text-muted">Courts</small>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="stat-card card text-center p-3 border-secondary border-top border-4">
+                <i class="fas fa-users fa-2x text-secondary mb-2"></i>
+                <h3 class="mb-0">@Model.TotalUsers</h3>
+                <small class="text-muted">Users</small>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="stat-card card text-center p-3 border-danger border-top border-4">
+                <i class="fas fa-money-bill-wave fa-2x text-danger mb-2"></i>
+                <h3 class="mb-0 small">Rs. @Model.TotalRevenue.ToString("N0")</h3>
+                <small class="text-muted">Revenue</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Links -->
+    <div class="row g-3 mb-4">
+        <div class="col-auto">
+            <a asp-action="Bookings" class="btn btn-success"><i class="fas fa-list me-2"></i>All Bookings</a>
+        </div>
+        <div class="col-auto">
+            <a asp-action="Courts" class="btn btn-primary"><i class="fas fa-futbol me-2"></i>Manage Courts</a>
+        </div>
+        <div class="col-auto">
+            <a asp-action="Users" class="btn btn-secondary"><i class="fas fa-users me-2"></i>View Users</a>
+        </div>
+        <div class="col-auto">
+            <a asp-action="CreateCourt" class="btn btn-outline-success"><i class="fas fa-plus me-2"></i>Add Court</a>
+        </div>
+    </div>
+
+    <!-- Recent Bookings Table -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-dark text-white">
+            <h5 class="mb-0"><i class="fas fa-history me-2"></i>Recent Bookings</h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0 align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>#</th>
+                            <th>Customer</th>
+                            <th>Court</th>
+                            <th>Date & Time</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>Payment</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var b in Model.RecentBookings)
+                        {
+                            <tr>
+                                <td>@b.Id</td>
+                                <td>
+                                    <strong>@b.User?.FullName</strong><br/>
+                                    <small class="text-muted">@b.User?.Email</small>
+                                </td>
+                                <td>@b.Court?.Name</td>
+                                <td>
+                                    @b.BookingDate.ToString("dd MMM")<br/>
+                                    <small>@b.StartTime.ToString(@"hh\:mm") - @b.EndTime.ToString(@"hh\:mm")</small>
+                                </td>
+                                <td class="text-success fw-bold">Rs. @b.TotalAmount.ToString("N0")</td>
+                                <td>
+                                    @{
+                                        var sc = b.Status switch {
+                                            FutsalBooking.Models.BookingStatus.Confirmed => "bg-success",
+                                            FutsalBooking.Models.BookingStatus.Pending => "bg-warning text-dark",
+                                            FutsalBooking.Models.BookingStatus.Cancelled => "bg-danger",
+                                            _ => "bg-secondary"
+                                        };
+                                    }
+                                    <span class="badge @sc">@b.Status</span>
+                                </td>
+                                <td>
+                                    <span class="badge @(b.PaymentStatus == FutsalBooking.Models.PaymentStatus.Paid ? "bg-success" : "bg-danger")">
+                                        @b.PaymentStatus
+                                    </span>
+                                </td>
+                                <td>
+                                    <form asp-action="UpdateBookingStatus" method="post" class="d-inline">
+                                        <input type="hidden" name="id" value="@b.Id" />
+                                        <select name="status" class="form-select form-select-sm d-inline w-auto"
+                                                onchange="this.form.submit()">
+                                            @foreach (var s in Enum.GetValues<FutsalBooking.Models.BookingStatus>())
+                                            {
+                                                <option value="@s" @(b.Status == s ? "selected" : "")>@s</option>
+                                            }
+                                        </select>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
